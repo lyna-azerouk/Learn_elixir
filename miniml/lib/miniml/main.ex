@@ -1,19 +1,12 @@
 defmodule Miniml.Main do
-  @moduledoc """
-  Documentation for `Miniml.Main`.
-  """
+  import Typeur
 
-  @doc """
-  Hello world.
+  def main do
 
-  ## Examples
+    IO.inspect("test")
 
-      iex> Miniml.Main.hello()
-      :world
 
-  """
-  def hello do
-    IO.puts("Hello, Elixir!")
-
+    IO.inspect("test")
   end
 end
+Miniml.Main.main()

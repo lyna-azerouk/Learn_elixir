@@ -1,5 +1,5 @@
 defmodule Typeur.Pterm do
-  @compteur_var ref: 0
+  @current_value ref: 0
 
   defmodule Liste do
     defstruct Vide: nil, Cons: nil
@@ -10,32 +10,33 @@ defmodule Typeur.Pterm do
 
 
   defmodule CompteurVar do
-    defp set(val) do
+    @compteur_var ref: 0
+
+    def set(val) do
       Process.put(:compteur_var, val)
     end
 
-    defp get do
+    def get do
       Process.get(:compteur_var)
     end
   end
-
-  defstruct Var: nil,
-              App: nil,
-              Abs: nil,
-              N: nil,
-              Add: nil,
-              Sou: nil,
-              ListP: nil,
-              Hd: nil,
-              Tail: nil,
-              Izte: nil
-
 
   defmodule Ptype do
      defstruct Var: nil,
                Arr: nil,
                Nat:  nil
   end
+
+  defstruct Var: nil,
+            App: nil,
+            Abs: nil,
+            N: nil,
+            Add: nil,
+            Sou: nil,
+            ListP: nil,
+            Hd: nil,
+            Tail: nil,
+            Izte: nil
 
 
   def translate_pterm(%{Var: var}), do: %{Var: var}
@@ -69,9 +70,10 @@ defmodule Typeur.Pterm do
   end
 
 
-  defp nouvelle_var do
-    CompteurVar.set(CompteurVar.get() + 1)
-    "T#{CompteurVar.get()}"
+
+
+  def alpha_conversion (t) do
+
   end
 
 end

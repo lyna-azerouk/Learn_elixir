@@ -18,6 +18,9 @@ defmodule Miniml.Main do
     result4 = print_term(term4)
     IO.puts(result4)
 
+    var =nouvelle_var()
+    IO.puts(var)
+
   end
 end
 Miniml.Main.main()

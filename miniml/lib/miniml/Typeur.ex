@@ -1,10 +1,22 @@
 defmodule Typeur.Pterm do
+  @compteur_var ref: 0
 
   defmodule Liste do
     defstruct Vide: nil, Cons: nil
 
     def vide, do: %Liste{Vide: nil}
     def cons(a, l), do: %Liste{Cons: {a, l}}
+  end
+
+
+  defmodule CompteurVar do
+    defp set(val) do
+      Process.put(:compteur_var, val)
+    end
+
+    defp get do
+      Process.get(:compteur_var)
+    end
   end
 
   defstruct Var: nil,
@@ -18,6 +30,14 @@ defmodule Typeur.Pterm do
               Tail: nil,
               Izte: nil
 
+
+  defmodule Ptype do
+     defstruct Var: nil,
+               Arr: nil,
+               Nat:  nil
+  end
+
+
   def translate_pterm(%{Var: var}), do: %{Var: var}
   def traanslate_pterm(%{App: {func, arg}}), do: %{App: {translate_pterm(func), translate_pterm(arg)}}
   def traanslate_pterm(%{Abs: {s, body}}), do: %{Abs: {s, translate_pterm(body)}}
@@ -28,7 +48,30 @@ defmodule Typeur.Pterm do
   def translate_pterm(%{ListeP: {%Liste{Cons: {a, l}}}}), do: %{ListeP: {Liste.cons(traanslate_pterm(a), traanslate_pterm(l))}}
   def translate_pterm(%{Hd: {%Liste{Cons: {a, l}}}}), do: %{Hd: {Liste.cons(traanslate_pterm(a), traanslate_pterm(l))}}
 
-  def print_term(%{Var: var} ), do: "x"
-  def print_term(%{App: {t1, t2}}), do: "(" + (print_term t1) +" "+ (print_term t2) + ")"
+  def print_term_liste(l) do
+    case l do
+      :Vide ->"nil"
+      {:Cons, {a, l}} -> "#{print_term(a)}  #{print_term_liste(l)}"
+    end
+  end
+
+  def print_term(t) do
+    case t do
+      {:Var, x} ->x
+      {:App, func, body} -> "(#{print_term(func)}  #{print_term(body)})"
+      {:Abs, x, t} -> "(fun #{x} -> #{print_term(t)})"
+      {:N, x} -> x
+      {:ListeP,  Vide } -> ""
+      {:ListeP, {:Cons, a, l}}  -> "[#{print_term((a))} , #{print_term_liste(l)}  ]"
+      {:Add, t1, t2} ->"#{print_term(t1)} +#{print_term(t2)}"
+
+    end
+  end
+
+
+  defp nouvelle_var do
+    CompteurVar.set(CompteurVar.get() + 1)
+    "T#{CompteurVar.get()}"
+  end
 
 end

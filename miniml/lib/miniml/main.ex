@@ -1,6 +1,6 @@
 defmodule Miniml.Main do
-  import Typeur.Pterm
-
+  import   Typeur.Pterm
+  import   Typeur.Pterm.State
   def main do
     term1 = {:Var, :x}
     result1 = print_term(term1)
@@ -17,9 +17,9 @@ defmodule Miniml.Main do
     term4 = {:ListeP, {:Cons, term1, :Vide}}
     result4 = print_term(term4)
     IO.puts(result4)
-    initial_state = %State{}
-    {variable_name, new_state} =nouvelle_var(initial_state)
-
+    initial_state =%Typeur.Pterm.State{compteur: 0}
+    variable_name =Typeur.Pterm.State.nouvelle_var(initial_state)
+    IO.puts variable_name
 
 
   end

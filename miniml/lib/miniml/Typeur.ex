@@ -55,15 +55,16 @@ defmodule Typeur.Pterm do
 
   defmodule State do
     defstruct compteur: 0
-      defp incrementer_compteur(%State{compteur: compteur} = state) do
-        %State{state | compteur: compteur + 1}
-      end
+    def incrementer_compteur(%State{compteur: compteur} = state) do
+      %State{ compteur: compteur + 1}
 
-      def nouvelle_var(%State{} = state) do
-        {nouvelle_var, new_state} = incrementer_compteur(state)
-        {"T#{nouvelle_var}", new_state}
-      end
- end
+    end
+
+    def nouvelle_var(%State{} = state) do
+      new_state = incrementer_compteur(state)
+      "T#{new_state.compteur}"
+    end
+   end
 
 
 end

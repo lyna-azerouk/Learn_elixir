@@ -17,9 +17,10 @@ defmodule Miniml.Main do
     term4 = {:ListeP, {:Cons, term1, :Vide}}
     result4 = print_term(term4)
     IO.puts(result4)
+    initial_state = %State{}
+    {variable_name, new_state} =nouvelle_var(initial_state)
 
-    var =nouvelle_var()
-    IO.puts(var)
+
 
   end
 end

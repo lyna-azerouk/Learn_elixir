@@ -1,24 +1,9 @@
 defmodule Typeur.Pterm do
-  @current_value ref: 0
-
   defmodule Liste do
     defstruct Vide: nil, Cons: nil
 
     def vide, do: %Liste{Vide: nil}
     def cons(a, l), do: %Liste{Cons: {a, l}}
-  end
-
-
-  defmodule CompteurVar do
-    @compteur_var ref: 0
-
-    def set(val) do
-      Process.put(:compteur_var, val)
-    end
-
-    def get do
-      Process.get(:compteur_var)
-    end
   end
 
   defmodule Ptype do
@@ -37,7 +22,6 @@ defmodule Typeur.Pterm do
             Hd: nil,
             Tail: nil,
             Izte: nil
-
 
   def translate_pterm(%{Var: var}), do: %{Var: var}
   def traanslate_pterm(%{App: {func, arg}}), do: %{App: {translate_pterm(func), translate_pterm(arg)}}
@@ -69,11 +53,17 @@ defmodule Typeur.Pterm do
     end
   end
 
+  defmodule State do
+    defstruct compteur: 0
+      defp incrementer_compteur(%State{compteur: compteur} = state) do
+        %State{state | compteur: compteur + 1}
+      end
 
+      def nouvelle_var(%State{} = state) do
+        {nouvelle_var, new_state} = incrementer_compteur(state)
+        {"T#{nouvelle_var}", new_state}
+      end
+ end
 
-
-  def alpha_conversion (t) do
-
-  end
 
 end

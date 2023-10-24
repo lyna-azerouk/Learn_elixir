@@ -10,8 +10,7 @@ defmodule Typeur.Pterm do
      defstruct Var: nil,
                Arr: nil,
                Nat:  nil
-  end
-
+   end
   defstruct Var: nil,
             App: nil,
             Abs: nil,
@@ -22,6 +21,10 @@ defmodule Typeur.Pterm do
             Hd: nil,
             Tail: nil,
             Izte: nil
+
+  defmodule Env do
+    defstruct Env: nil
+  end
 
   def translate_pterm(%{Var: var}), do: %{Var: var}
   def traanslate_pterm(%{App: {func, arg}}), do: %{App: {translate_pterm(func), translate_pterm(arg)}}
@@ -57,14 +60,35 @@ defmodule Typeur.Pterm do
     defstruct compteur: 0
     def incrementer_compteur(%State{compteur: compteur} = state) do
       %State{ compteur: compteur + 1}
-
     end
 
     def nouvelle_var(%State{} = state) do
       new_state = incrementer_compteur(state)
       "T#{new_state.compteur}"
     end
-   end
+  end
+  defmodule Exception  do
+    defexception message: "var non trouvé "
+  end
 
+#Si recurssion ==>  plusieurs fonction avec patern match
+  defp cherche_type(_, []), do: raise "Exception.defexception"
+  defp cherche_type(s, [{v1, _v2}|_tail]) when v1== s, do: v1
+  defp cherche_type(s, [{_v1, _}|tail]), do: cherche_type(s, tail)
+
+
+ @spec alpha_convertion(any(), any()) :: nil
+ def alpha_convertion(l, acc) do
+     case l do
+        {:Var, x} ->(case acc do
+                       []-> {:Var ,State.nouvelle_var(%State{compteur: 0})}
+                       [{var, new_var}|tail]  -> (if var == x  do
+                        {:Var, new_var}
+                       else
+                        alpha_convertion({:Var, x}, tail)
+                       end)
+                    end)
+     end
+ end
 
 end

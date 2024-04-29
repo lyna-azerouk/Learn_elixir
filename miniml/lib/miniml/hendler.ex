@@ -7,7 +7,6 @@ defmodule Servy.HttpServer3 do
   alias Servy.VideoCam
   import Servy.Parser
 
- @doc "Transforms the request into a response."
  def handle(request) do
   request
   |> parse
@@ -50,5 +49,21 @@ end
 
     %{ conv | status: 200, resp_body: inspect {snapshots, where_is_bigfoot} }
   end
+
+  ## the function route will be called when the request is a POST request and the path is /pledges
+  def route(%Conv{method: "POST", path: "/pledges"} = conv) do
+    Servy.get_sensor_data.create(conv, conv.params)
+  end
+
+  def route(%Conv{ method: "GET", path: "/sensors" } = conv) do
+    sensor_data = Servy.SensorServer.get_sensor_data()
+
+    %{ conv | status: 200, resp_body: inspect sensor_data }
+  end
+
+  def route(%Conv{ method: "GET", path: "/kaboom" }) do
+    raise "Kaboom!"
+  end
+
 
 end

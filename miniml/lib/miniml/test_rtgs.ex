@@ -1,4 +1,4 @@
-defmodule Servy.PledgeServerGen do
+defmodule Servy.PledgeServer do
 
   @name :pledge_server
 
@@ -11,6 +11,7 @@ defmodule Servy.PledgeServerGen do
   # Client Interface
 
   def start do
+    IO.puts "Starting the pledge server..."
     GenServer.start(__MODULE__, %State{}, name: @name)
   end
 
@@ -22,16 +23,24 @@ defmodule Servy.PledgeServerGen do
     GenServer.call @name, :recent_pledges
   end
 
+  def total_pledged do
+    GenServer.call @name, :total_pledged
+  end
+
+  def clear do
+    GenServer.cast @name, :clear
+  end
+
   def set_cache_size(size) do
     GenServer.cast @name, {:set_cache_size, size}
   end
 
   # Server Callbacks
 
-  def init(state) do ## this function is called when the server is started
+  def init(state) do
     pledges = fetch_recent_pledges_from_service()
     new_state = %{state | pledges: pledges}
-    {:ok, new_state} ### initialisation wtf
+    {:ok, new_state}
   end
 
   def handle_cast(:clear, state) do
@@ -41,6 +50,11 @@ defmodule Servy.PledgeServerGen do
   def handle_cast({:set_cache_size, size}, state) do
     new_state = %{ state | cache_size: size}
     {:noreply, new_state}
+  end
+
+  def handle_call(:total_pledged, _from, state) do
+    total = Enum.map(state.pledges, &elem(&1, 1)) |> Enum.sum
+    {:reply, total, state}
   end
 
   def handle_call(:recent_pledges, _from, state) do
@@ -61,28 +75,15 @@ defmodule Servy.PledgeServerGen do
   end
 
   defp send_pledge_to_service(_name, _amount) do
+    # CODE GOES HERE TO SEND PLEDGE TO EXTERNAL SERVICE
     {:ok, "pledge-#{:rand.uniform(1000)}"}
   end
 
   defp fetch_recent_pledges_from_service do
+    # CODE GOES HERE TO FETCH RECENT PLEDGES FROM EXTERNAL SERVICE
 
-    [ {"*******", 15} ]
+    # Example return value:
+    [ {"wilma", 15}, {"fred", 25} ]
   end
 
 end
-
-alias Servy.PledgeServerGen
-
-{:ok, pid} = PledgeServerGen.start()
-
-send pid, {:stop, "hammertime"}
-
-PledgeServerGen.set_cache_size(4)
-
-IO.inspect PledgeServerGen.create_pledge("larry", 10)
-
-# PledgeServer.clear()
-
-IO.inspect PledgeServerGen.create_pledge("moe", 20)
-
-IO.inspect PledgeServerGen.recent_pledges()

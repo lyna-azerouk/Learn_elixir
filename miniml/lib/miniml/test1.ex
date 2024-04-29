@@ -9,6 +9,7 @@ defmodule Servy.HttpServer do
   end
 
   defp accept_loop(listen_socket) do
+    IO.puts("accept loop")
     # Block until a client connects
     {:ok, client_socket} = :gen_tcp.accept(listen_socket)
     # Process the client request

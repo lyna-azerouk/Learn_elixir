@@ -1,18 +1,18 @@
-defmodule Servy.PledgeServer do
+defmodule Servy.PledgeServerBis do
 
   @name :pledge_server
 
   use GenServer
 
-  defmodule State do
+
+  defmodule State do  #define new struct
     defstruct cache_size: 3, pledges: []
   end
 
   # Client Interface
-
   def start do
     IO.puts "Starting the pledge server..."
-    GenServer.start(__MODULE__, %State{}, name: @name)
+    GenServer.start(__MODULE__, %State{}, name: @name)  ### define the init function to define the  state (init is called automaticly)
   end
 
   def create_pledge(name, amount) do
@@ -31,30 +31,26 @@ defmodule Servy.PledgeServer do
     GenServer.cast @name, :clear
   end
 
+
   def set_cache_size(size) do
     GenServer.cast @name, {:set_cache_size, size}
   end
 
   # Server Callbacks
-
-  def init(state) do
-    pledges = fetch_recent_pledges_from_service()
-    new_state = %{state | pledges: pledges}
-    {:ok, new_state}
+  def init (state) do
+    {:ok,  %{state | pledges: fetch_recent_pledges_from_service()}}
   end
 
   def handle_cast(:clear, state) do
     {:noreply, %{ state | pledges: []}}
   end
-
   def handle_cast({:set_cache_size, size}, state) do
-    new_state = %{ state | cache_size: size}
-    {:noreply, new_state}
+    {:noreply, %{ state | cache_size: size}}
   end
 
   def handle_call(:total_pledged, _from, state) do
     total = Enum.map(state.pledges, &elem(&1, 1)) |> Enum.sum
-    {:reply, total, state}
+    {:reply, total, state}  ## we add reply because of the genserver
   end
 
   def handle_call(:recent_pledges, _from, state) do
@@ -69,6 +65,7 @@ defmodule Servy.PledgeServer do
     {:reply, id, new_state}
   end
 
+
   def handle_info(message, state) do
     IO.puts "Can't touch this! #{inspect message}"
     {:noreply, state}
@@ -80,10 +77,17 @@ defmodule Servy.PledgeServer do
   end
 
   defp fetch_recent_pledges_from_service do
-    # CODE GOES HERE TO FETCH RECENT PLEDGES FROM EXTERNAL SERVICE
-
-    # Example return value:
     [ {"wilma", 15}, {"fred", 25} ]
   end
-
 end
+
+alias Servy.PledgeServerBis
+
+{:ok, pid} = PledgeServerBis.start()  ##no error hier it 's ok
+
+send pid, {:stop, "hammertime"}
+
+IO.inspect PledgeServerBis.create_pledge("FIRST PLEGE", 10)
+ IO.inspect PledgeServerBis.recent_pledges() #the result is: [{"FIRST PLEGE", 10}, {"wilma", 15}, {"fred", 25}] where   {"wilma", 15}, {"fred", 25} commes from init and {"FIRST PLEGE", 10} comme from :create_peldge
+
+# IO.inspect PledgeServerBis.total_pledged()

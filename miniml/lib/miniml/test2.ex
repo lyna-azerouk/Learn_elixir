@@ -1,5 +1,5 @@
 defmodule Servy.HttpServer2 do
-  import :gen_tcp
+  # import :gen_tcp
 
 
   ## Starts a simple HTTP server on a specified port

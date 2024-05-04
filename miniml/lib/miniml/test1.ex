@@ -32,19 +32,19 @@ defmodule Servy.HttpServer do
     request
   end
 
-  defp generate_response(_request) do
-    """
-    HTTP/1.1 200 OK\r
-    Content-Type: text/plain\r
-    Content-Length: 12\r
-    \r
-    Hello World!
-    """
-  end
+  # defp generate_response(_request) do
+  #   """
+  #   HTTP/1.1 200 OK\r
+  #   Content-Type: text/plain\r
+  #   Content-Length: 12\r
+  #   \r
+  #   Hello World!
+  #   """
+  # end
 
-  defp write_response(response, client_socket) do
-    :ok = :gen_tcp.send(client_socket, response)
-    IO.inspect("response has been sent to the client")
-    :ok = :gen_tcp.close(client_socket)
-  end
+  # defp write_response(response, client_socket) do
+  #   :ok = :gen_tcp.send(client_socket, response)
+  #   IO.inspect("response has been sent to the client")
+  #   :ok = :gen_tcp.close(client_socket)
+  # end
 end

@@ -1,4 +1,5 @@
-defmodule Servy.PledgeServerGen do
+defmodule Servy.PledgeServerGen do    #Importnat
+
 
   @name :pledge_server
 
@@ -55,8 +56,7 @@ defmodule Servy.PledgeServerGen do
     {:reply, id, new_state}
   end
 
-  def handle_info(message, state) do
-    IO.puts "Can't touch this! #{inspect message}"
+  def handle_info(_message, state) do
     {:noreply, state}
   end
 
@@ -79,10 +79,10 @@ send pid, {:stop, "hammertime"}
 
 PledgeServerGen.set_cache_size(4)
 
-IO.inspect PledgeServerGen.create_pledge("larry", 10)
+IO.inspect PledgeServerGen.create_pledge("$$$$$$$$$$", 10)
 
 # PledgeServer.clear()
 
-IO.inspect PledgeServerGen.create_pledge("moe", 20)
+IO.inspect PledgeServerGen.create_pledge("€€€€€€€€€€€€€€€€€", 20)
 
 IO.inspect PledgeServerGen.recent_pledges()

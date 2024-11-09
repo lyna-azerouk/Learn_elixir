@@ -2,6 +2,7 @@ defmodule RaffleyWeb.RaffleLive.Index do
   use RaffleyWeb, :live_view
 
   alias Raffley.Raffles
+  import RaffleyWeb.CustomComponent
 
   def mount(_, _, socket) do
     socket = assign(socket, raffles: Raffles.list_raffles())
@@ -11,6 +12,15 @@ defmodule RaffleyWeb.RaffleLive.Index do
   def render(assigns) do
     ~H"""
     <div class="raffle-index">
+      <.banner>
+        <.icon name="hero-sparkles-solid" /> Soon
+        <:details :let={vibe}>
+          hello <%= vibe %>
+        </:details>
+         <:details>
+          blalbla
+        </:details>
+      </.banner>
       <div class="raffles">
         <%= for raffle <- @raffles do %>
         <.raffle_card raffle={raffle}/>
@@ -35,13 +45,18 @@ defmodule RaffleyWeb.RaffleLive.Index do
     """
   end
 
-  attr :status, :string, required: true  ## est appliquer uniquemnt a la fonction qui suit
-  ## To avoid compenent duplication
-  def badge(assigns) do
-    ~H"""
-      <div class="rounded-md px-2 py-1 text-xs font-medium uppercase inline-block border text-lime-600 border-lime-600">
-        <%= @status %>
-      </div>
-    """
-  end
+  # attr :status, :string, required: true  ## est appliquer uniquemnt a la fonction qui suit
+  # ## To avoid compenent duplication
+  # def badge(assigns) do
+  #   ~H"""
+  #     <div class={[
+  #         "rounded-md px-2 py-1 text-xs font-medium uppercase inline-block border",
+  #         @status=="state1" && "text-lime-600 border-lime-600",
+  #         @status=="state2" && "text-lime-600 border-red-600",
+  #         @status=="state3" && "text-lime-600 border-blue-600"
+  #       ]}>
+  #       <%= @status %>
+  #     </div>
+  #   """
+  # end
 end

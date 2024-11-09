@@ -1,0 +1,14 @@
+<div class ="rules">
+  <h1> The rules </h1>
+  <%= @welcome %>
+
+  <ol>
+    <%= for rule <- @rules do %>
+      <li>
+      <a href={~p"/rules/#{rule.id}"}>
+        <%= rule.text %>
+      </a>
+      </li>
+    <% end %>
+  </ol>
+</div>

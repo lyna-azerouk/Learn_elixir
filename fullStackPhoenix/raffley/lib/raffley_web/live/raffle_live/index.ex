@@ -30,18 +30,21 @@ defmodule RaffleyWeb.RaffleLive.Index do
     """
   end
 
+  #FUNCTION; navigate ==> evite de faire une requette http, donc on a pas une deconection de la socket et un nouveau call a la fonction mount de la liveview show, mais directement a la fonction handel_params de la liveView.show
   def raffle_card(assigns) do
     ~H"""
-      <div class="card">
-        <img src={@raffle.image_path} />
-        <h1> <%= @raffle.prize %> </h1>
-        <div class="details">
-          <div class="price">
-            <h3> <%= @raffle.ticket_price %> </h3>
+      <.link navigate={~p"/raffles/#{@raffle.id}"}>
+        <div class="card">
+          <img src={@raffle.image_path} />
+          <h1> <%= @raffle.prize %> </h1>
+          <div class="details">
+            <div class="price">
+              <h3> <%= @raffle.ticket_price %> </h3>
+            </div>
+            <.badge status={@raffle.status}/>
           </div>
-          <.badge status={@raffle.status}/>
         </div>
-      </div>
+      </.link>
     """
   end
 

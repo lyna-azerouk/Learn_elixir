@@ -10,9 +10,10 @@ defmodule RaffleyWeb.EstimatorLive do
       Process.send_after(self(), :tick, 2000) # send a message to the liveview itself
     end
 
-    socket = assign(socket, tickets: 0, price: 3)
+    socket = assign(socket, tickets: 0, price: 3, page_title: "Estimator")
     IO.inspect(self(), label: "mOUNT")
-    {:ok, socket}
+    # {:ok, socket, layout: {RaffleyWeb.Layouts, :simple}}
+     {:ok, socket}
   end
 
   def handle_event("add", %{"qte"=> qte}, socket) do

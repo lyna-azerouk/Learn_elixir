@@ -30,7 +30,7 @@ defmodule RaffleyWeb.RaffleLive.Index do
     """
   end
 
-  #FUNCTION; navigate ==> evite de faire une requette http, donc on a pas une deconection de la socket et un nouveau call a la fonction mount de la liveview show, mais directement a la fonction handel_params de la liveView.show
+  #FUNCTION; navigate ==> faster then href  ==> evite de faire une requette http, donc on a pas une deconection de la socket et un nouveau call a la fonction mount de la liveview show, mais directement a la fonction handel_params de la liveView.show
   def raffle_card(assigns) do
     ~H"""
       <.link navigate={~p"/raffles/#{@raffle.id}"}>

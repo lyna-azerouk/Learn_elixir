@@ -1,54 +1,59 @@
 defmodule DayTwo do
-
   def run do
-    case File.read("day_two.txt") do
-      {:ok, content} -> build_list(content)
-        _  -> nil
+    "day_two.txt"
+    |> File.read()
+    |> case do
+      {:ok, content} ->
+        content
+        |> parse_input()
+        |> count_valid_lists()
+        |> IO.inspect(label: "Valid lists count")
+
+      {:error, reason} ->
+        IO.puts("Error reading file: #{reason}")
     end
-    |> Enum.count(fn x ->(is_sorted_acc?(x) || is_sorted_des?(x)) && is_safe?(x) end)
-    |>IO.inspect()
   end
 
-  defp build_list(content) do
-    String.split(content, "\n")
-    |> Enum.reduce([], fn x, acc -> acc ++ [(String.split(x, " "))] end)
+  defp parse_input(content) do
+    content
+    |> String.split("\n", trim: true)
+    |> Enum.map(&String.split(&1, " "))
   end
 
-  defp is_safe?([head | rest ]) do
-    case rest do
-      [x | _] ->
-        if abs(String.to_integer(x) - String.to_integer(head)) in [1, 2, 3] do
-          is_safe?(rest)
-        else
-          false
-        end
-      _ -> true
+  defp count_valid_lists(lists) do
+    Enum.count(lists, &valid_list?/1)
+  end
+
+  defp valid_list?(list) do
+    (is_sorted_asc?(list) || is_sorted_desc?(list)) && is_safe?(list)
+  end
+
+  defp is_safe?([head | rest]) do
+    Enum.reduce_while(rest, String.to_integer(head), fn x, prev ->
+      x_int = String.to_integer(x)
+
+      if abs(x_int - prev) in [1, 2, 3] do
+        {:cont, x_int}
+      else
+        {:halt, false}
       end
+    end) !== false
   end
 
-  defp is_safe?(_), do: true
+  defp is_safe?([]), do: true
 
-  defp is_sorted_acc?([x | rest]) do
-    case rest do
-      [y | _] ->
-        if String.to_integer(x) < String.to_integer(y) do
-          is_sorted_acc?(rest)
-        else
-          false
-        end
-      _ -> true
-    end
-  end
+  defp is_sorted_asc?([x | rest]), do: check_sorted(rest, String.to_integer(x), &<=/2)
+  defp is_sorted_desc?([x | rest]), do: check_sorted(rest, String.to_integer(x), &>=/2)
 
-  defp is_sorted_des?([x | rest]) do
-    case rest do
-      [y | _] ->
-        if String.to_integer(x) > String.to_integer(y) do
-          is_sorted_des?(rest)
-        else
-          false
-        end
-      _ -> true
+  defp check_sorted([], _prev, _cmp), do: true
+
+  defp check_sorted([x | rest], prev, cmp) do
+    current = String.to_integer(x)
+
+    if cmp.(prev, current) do
+      check_sorted(rest, current, cmp)
+    else
+      false
     end
   end
 end

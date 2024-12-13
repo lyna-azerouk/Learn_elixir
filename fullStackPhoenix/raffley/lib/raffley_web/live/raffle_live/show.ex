@@ -17,7 +17,7 @@ defmodule RaffleyWeb.RaffleLive.Show do
 
 
   def handle_params(%{"id" => id}, _uri, socket) do  ## handle_params est toujours appeler apres mount et avant render on peut donc definir les paramettre de la socket soit dans la fonction mount dirrectement soit dans hadel_params ==> une question de choix
-    raffel = Raffles.get_raffel(id)
+    raffel = Raffles.get_raffel!(id)
     feature_raffels = Raffles.feature_raffles(raffel)
 
     socket =

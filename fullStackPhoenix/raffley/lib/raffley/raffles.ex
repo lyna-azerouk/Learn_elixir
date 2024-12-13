@@ -1,48 +1,85 @@
-
-defmodule Raffley.Raffle do
-  defstruct [:id, :prize, :ticket_price, :image_path, :status, :description]
-end
-
 defmodule Raffley.Raffles do
 
+  alias Raffley.Rafles.Raffele
+  alias Raffley. Repo
+  import Ecto.Query
+
+  # def list_raffles() do
+  #   [
+  #     %Raffele{
+  #       prize: "$ prize1 $",
+  #       ticket_price: 10,
+  #       image_path: "/images/tree-down.jpg",
+  #       status: :upcoming,
+  #       description: "desc1"
+  #     },
+  #     %Raffele{
+  #       prize: "$ prize2 $",
+  #       ticket_price: 20,
+  #       image_path: "/images/tree-down.jpg",
+  #       status: :open,
+  #       description: "desc2"
+  #     },
+  #     %Raffele{
+  #       prize: "$ prize3 $",
+  #       ticket_price: 80,
+  #       image_path: "/images/tree-down.jpg",
+  #       status: :closed,
+  #       description: "desc3"
+  #     }
+  #   ]
+  # end
+
+
   def list_raffles() do
-    [
-      %Raffley.Raffle{
-        id: 1,
-        prize: "$ prize1 $",
-        ticket_price: 10,
-        image_path: "/images/tree-down.jpg",
-        status: "state1",
-        description: "desc1"
-      },
-      %Raffley.Raffle{
-        id: 2,
-        prize: "$ prize2 $",
-        ticket_price: 20,
-        image_path: "/images/tree-down.jpg",
-        status: "state2",
-        description: "desc2"
-      },
-      %Raffley.Raffle{
-        id: 3,
-        prize: "$ prize3 $",
-        ticket_price: 80,
-        image_path: "/images/tree-down.jpg",
-        status: "state3",
-        description: "desc3"
-      }
-    ]
+    Repo.all(Raffele)
   end
 
-  def get_raffel(id) when is_integer(id) do
-    Enum.find(list_raffles(), fn r -> r.id == id end)
+  def get_raffel!(id) when is_binary(id) do
+    id |> String.to_integer() |> get_raffel!()
   end
 
-  def get_raffel(id) when is_binary(id) do
-    Enum.find(list_raffles(), fn r -> r.id == (id |> String.to_integer()) end)
+  # Raise an exception
+  def get_raffel!(id) do
+    Repo.get!(Raffele, id)
   end
+
+
+  def filter_raffles(filter) do
+    Raffele
+    |> with_status(filter["status"])
+    |> search_by(filter["q"])
+    |> sort_by(filter["sorted_by"])
+    |> Repo.all()
+  end
+
+  defp with_status(query, status) when status in ~w(open closed upcoming) do
+    where(query, status: ^status)
+  end
+
+  defp with_status(query, _), do: query
+
+  defp search_by(query, q) when q in ["", nil],  do: query
+
+  defp search_by(query, q) do
+    where(query, [r], ilike( r.prize, ^"%#{q}%"))
+  end
+
+  defp sort_by(query, "prize") do
+    query |> order_by(:prize)
+  end
+
+  defp sort_by(query, "ticket_price") do
+    query |> order_by(:ticket_price)
+  end
+
+  defp sort_by(query, _), do: query
 
   def feature_raffles(raffle) do
-    list_raffles() |> List.delete(raffle)
+    Raffele
+    |> where(status: :open)
+    |> where([r], r.id != ^raffle.id)
+    |> order_by(desc: :ticket_price)
+    |> Repo.all()
   end
 end

@@ -14,10 +14,10 @@ defmodule RaffleyWeb.RaffleLive.Index do
     {:ok, socket}
   end
 
-  def handle_params(params, _, socket) do
+  def handle_params(params, _, socket) do #alwayes caled after mount or after push_patch
     socket =
       socket
-      |> stream(:raffles, Raffles.filter_raffles(params))
+      |> stream(:raffles, Raffles.filter_raffles(params), reset: true)
       |> assign(form: to_form(params)) # by default parms is empty
 
     {:noreply, socket}
@@ -34,7 +34,9 @@ defmodule RaffleyWeb.RaffleLive.Index do
         |> Map.take(~w(q status sorted_by))
         |> Map.reject(fn {_, value} -> value == "" end)
 
-      socket = push_navigate(socket, to: ~p"/raffles?#{params}") ## push_navigate will kill the first liveview and create a new one, with mount is called so handel_params is called just affter th
+      ## push_navigate will kill the first liveview and create a new one, with mount is called so handel_params is called just affter the amount function
+      ## For better practicies and to avoid a new live_view call, so to keep the same PID_live_view we need to use push_patch so mount is not invoked but H_params is invoked in the same process PID_live_view
+      socket = push_patch(socket, to: ~p"/raffles?#{params}")
       {:noreply, socket}
   end
 
@@ -52,6 +54,8 @@ defmodule RaffleyWeb.RaffleLive.Index do
       </.banner>
 
       <.filter_from form={@form} />
+
+      <.link patch={~p"/raffles"}> Reset </.link>
 
       <div class="raffles" id="raffles" phx-update="stream">
         <%= for {dom_id, raffle} <- @streams.raffles do %>

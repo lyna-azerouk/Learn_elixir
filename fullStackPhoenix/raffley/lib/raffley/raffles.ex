@@ -74,8 +74,9 @@ defmodule Raffley.Raffles do
   end
 
   defp sort_by(query, _), do: query
-
   def feature_raffles(raffle) do
+    Process.sleep(3000)
+
     Raffele
     |> where(status: :open)
     |> where([r], r.id != ^raffle.id)

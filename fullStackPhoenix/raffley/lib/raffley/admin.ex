@@ -18,4 +18,18 @@ defmodule Raffley.Admin do
   def change_raffel(raffel, attrs \\ %{}) do
     Raffele.changeset(raffel, attrs)
   end
+
+  def get_raffle!(id) do
+    Repo.get!(Raffele, id)
+  end
+
+  def update_raffle(raffel, attrs) do
+    raffel
+    |> Raffele.changeset(attrs)
+    |> Repo.update()
+  end
+
+  def delete_raffel(raffel) do
+    Repo.delete!(raffel)
+  end
 end

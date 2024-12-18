@@ -4,24 +4,53 @@ alias Raffley.Rafles.Raffele
 
   alias Raffley.Admin
 
-  def mount(_, _, socket) do
-    changeset = Admin.change_raffel(%Raffele{})  ##  to insert the default values on the form
-    socket =
-      socket
-      |> assign(:page_title, "New raffle")
-      |> assign(form: to_form(changeset, as: "raffele"))
+  def mount(params, _, socket) do
+    socket = apply_action(socket, socket.assigns.live_action, params)
 
     {:ok, socket}
   end
 
+  defp apply_action(socket, :new, _) do
+    raffle = %Raffele{}
+    changeset = Admin.change_raffel(raffle)  ##  to insert the default values on the form
+
+    socket
+    |> assign(:page_title, "New raffle")
+    |> assign(form: to_form(changeset, as: "raffele"))
+    |> assign(raffle: raffle)
+  end
+
+  defp apply_action(socket, :edit, %{"id" => id}) do
+    raffle = Admin.get_raffle!(id)
+    changeset = Admin.change_raffel(raffle)
+
+    socket
+    |> assign(:page_title, "Edit raffle")
+    |> assign(form: to_form(changeset, as: "raffele"))
+    |> assign(raffle: raffle)
+  end
+
 
   def handle_event("save", %{"raffele" => raffle_params}, socket) do
-     Admin.create_raffle(raffle_params)
+    save_raffle(socket, socket.assigns.live_action, raffle_params)
+  end
+
+  def handle_event("validate", %{"raffele" => raffle_params}, socket) do ## will print the errors each time an input is updated
+    changeset = Admin.change_raffel(%Raffele{}, raffle_params)
+    socket =
+      socket
+      |> assign(:form, to_form(changeset, action: :validate))
+    {:noreply, socket}
+  end
+
+
+  defp save_raffle(socket, :new, raffle_params) do
+    Admin.create_raffle(raffle_params)
     |> case do
       {:ok, _} ->
         socket =
           socket
-          |> put_flash(:info, "OK")
+          |> put_flash(:info, "OK saved")
           |> push_navigate( to: ~p"/admin/raffles")
         {:noreply, socket}
 
@@ -33,13 +62,22 @@ alias Raffley.Rafles.Raffele
     end
   end
 
-  def handle_event("validate", %{"raffele" => raffle_params}, socket) do ## will print the errors each time an input is updated
-    changeset = Admin.change_raffel(%Raffele{}, raffle_params)
+  defp save_raffle(socket, :edit, raffle_params) do
+    Admin.update_raffle(socket.assigns.raffle, raffle_params)
+    |> case do
+      {:ok, _} ->
+        socket =
+          socket
+          |> put_flash(:info, "OK updated")
+          |> push_navigate( to: ~p"/admin/raffles")
+        {:noreply, socket}
 
-    socket =
-      socket
-      |> assign(:form, to_form(changeset, action: :validate))
-    {:noreply, socket}
+      {:error, %Ecto.Changeset{} = changeset} ->
+        socket = socket
+          |> assign(:form, to_form(changeset))
+          |> put_flash(:error, "Error")
+        {:noreply, socket}
+    end
   end
 
   def render(assigns) do

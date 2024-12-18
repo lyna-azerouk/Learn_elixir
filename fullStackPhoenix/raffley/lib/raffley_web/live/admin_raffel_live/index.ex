@@ -13,6 +13,18 @@ defmodule RaffleyWeb.AdminRaffelLive.Index do
     {:ok, socket}
   end
 
+  def handle_event("delete", %{"id" => id}, socket) do #
+  raffle = Admin.get_raffle!(id)
+
+   Admin.delete_raffel(raffle)
+
+   socket =
+     socket
+     |> put_flash(:info, "OK deleted")
+     |> push_navigate( to: ~p"/admin/raffles")
+  {:noreply, socket}
+end
+
   #phx-update and id will automaticlly be added to the table if we dont use <./table> we nedd to add them
   def render(assigns) do
     ~H"""
@@ -37,6 +49,18 @@ defmodule RaffleyWeb.AdminRaffelLive.Index do
         <:col :let={{_dom_id, raffle}}  label="Ticket Price">
           <%= raffle.ticket_price %>
         </:col>
+
+        <:action :let={{_dom_id, raffle}} >
+          <.link navigate={~p"/admin/raffles/#{raffle}/edit"} class="button">
+            Edit
+          </.link>
+        </:action>
+
+        <:action :let={{_dom_id, raffle}} >
+          <.link phx-click="delete" phx-value-id={raffle.id} class="button"  data-confirm="Are you sure?">
+            Delete
+          </.link>
+        </:action>
       </.table>
     </div>
     """

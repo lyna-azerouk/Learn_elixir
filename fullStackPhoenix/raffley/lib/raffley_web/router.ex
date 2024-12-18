@@ -43,7 +43,8 @@ defmodule RaffleyWeb.Router do
 
     #Admin
     live "/admin/raffles", AdminRaffelLive.Index
-    live "/admin/raffles/new", AdminRaffelLive.Form
+    live "/admin/raffles/new", AdminRaffelLive.Form, :new
+    live "/admin/raffles/:id/edit", AdminRaffelLive.Form, :edit
   end
 
   # Other scopes may use custom stacks.
